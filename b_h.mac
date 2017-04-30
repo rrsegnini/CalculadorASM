@@ -1,0 +1,259 @@
+
+%include "io.mac"
+
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------
+%macro	checkFloat 1
+	mov 	CX, 263
+	mov	EDX, 1
+	mov 	EAX, 0
+	
+check:
+	mov 	AL, byte[%1 + EDX]
+	cmp	AL, '.'
+	je	TRUE
+	inc	EDX
+	loop	check
+	jmp	FALSE
+TRUE:
+	mov	EAX, 'True'
+	jmp	SALIR
+FALSE:
+	jmp	SALIR
+	
+SALIR:
+	nwln
+	
+%endmacro
+
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------
+
+%macro	bF_dF 	2	;Binary in floating point to decimal
+	mov 	CX, 263
+	mov	EDX, 0
+	mov 	EAX, 0
+	mov	EBX, 0	;RESULTADO
+	mov	dword[frac], 0	;RESULTADO FRACCIONARIO
+		
+recorrer:
+	;PutLInt	dword[frac]
+	mov 	AL, byte[%1 + EDX]
+
+	cmp	AL, '.'		;SALIR SI LLEGA AL FINAL DEL STRING
+	je	bF_dF_frac
+
+	sub	AL, '0'
+	nwln
+	
+
+	call	pow
+	
+	;PutLInt	EBX
+	nwln
+
+	inc	EDX
+	loop	recorrer
+	jmp	bF_dF_salir
+	
+
+pow:
+	push	CX
+	push	EDX
+
+
+	cmp	EDX, 0
+	je	pow_primero
+
+
+	;PutLInt	EDX
+
+	
+	cmp	AL, 1
+	je	Uno
+	jmp	Cero
+
+Uno:
+	shl	EBX, 1
+	add	EBX, EAX
+
+	pop 	EDX
+	pop	CX
+	jmp	pow_salir
+
+pow_primero:
+	inc 	EDX
+	cmp	AL, 1
+	je	Uno
+
+Cero:
+
+
+	
+	shl	EBX, 1
+
+	pop	EDX
+	pop	CX
+
+	
+pow_salir:
+	ret
+	
+
+
+bF_dF_frac:
+	mov	SI, 1
+	;PutInt	SI
+	;push	S
+bF_dF_frac_2:
+
+	inc	EDX
+	push	EDX
+	;PutLInt	EDX
+	nwln
+	mov	EAX, 0
+	mov 	AL, byte[%1 + EDX]
+	PutCh	AL
+	;nwln
+	cmp	AL, 0		;SALIR SI LLEGA AL FINAL DEL STRING
+	je	bF_dF_salir
+	
+	
+	cmp	AL, '1'
+	je	Uno_frac
+	cmp	AL, '0'
+	je	Cero_frac
+	jmp	Frac_loop
+
+Uno_frac:
+	
+	mov	EAX, 5
+	mul	SI
+	;PutInt	SI
+	;nwln
+	mov	SI, AX
+
+	;PutInt	SI
+	;nwln	
+	add	word[%2], SI
+	;PutLInt	%2
+	;mov	dword[%2], EAX
+
+;jmp	bF_dF_salir
+
+	jmp	Frac_loop
+	
+Cero_frac:
+	mov	EAX, 5
+	mul	SI
+	mov	SI, AX
+	;PutInt	AX
+	;nwln
+Frac_loop:
+	pop	EDX
+	loop	bF_dF_frac_2
+		
+		 
+bF_dF_salir:
+	nwln	
+	
+%endmacro
+
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------
+
+%macro	b_h	1	;number
+	mov 	CX, 263
+	mov	EDX, 1 
+	mov 	EAX, 0
+	mov	EBX, 0
+read_str:
+	mov	EAX, dword[%1 + EDX]
+	;mov	[digit], EAX
+	;PutStr	digit
+	cmp	EAX, 0
+	je	SALIR
+
+	cmp 	EAX, '1010'
+	je	A
+	cmp	EAX, '1011'
+	je	B
+	cmp	EAX, '1100'
+	je	C
+	cmp	EAX, '1101'
+	je	D
+	cmp	EAX, '1110'
+	je	E
+	cmp	EAX, '1111'
+	je	F
+	;jmp	read_str2
+
+	jmp	de0_9
+
+read_str2:
+	loop 	read_str
+	jmp	SALIR
+	 
+
+de0_9:
+	sub	EAX, 185
+	jmp	read_str2
+	;PutLInt	EAX
+		
+
+
+A:
+	PutCh 	'A'
+	add	EDX, 4
+	jmp 	read_str2
+B:
+	PutCh 	'B'
+	add	EDX, 4
+	jmp 	read_str2
+C:
+	PutCh 	'C'
+	add	EDX, 4
+	jmp 	read_str2
+D:
+	PutCh 	'D'
+	add	EDX, 4
+	jmp 	read_str2
+E:
+	PutCh 	'E'
+	add	EDX, 4
+	jmp 	read_str2
+F:
+	PutCh 	'F'
+	add	EDX, 4
+	jmp 	read_str2
+
+
+SALIR:
+	nwln
+	;ret
+	
+
+
+%endmacro
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -62,7 +62,7 @@ reading:
 	je	vaciar_pila
 
 	;pop	EAX
-	;pioridades	EAX, byte[operation + EBX] ;Compara prioridades DENTRO DE LA PILA (%1) y FUERA DE LA PILA (%2)
+	;pioridades	AL, byte[operation + EBX] ;Compara prioridades DENTRO DE LA PILA (%1) y FUERA DE LA PILA (%2)
 	inc	EBX
 
 loop:
@@ -191,6 +191,7 @@ pila_vacia:
 
 vaciar_pila:
 	pop	EAX
+	PutCh	AL
 	cmp	AL, '('
 	je	vaciar_pila_salir
 	

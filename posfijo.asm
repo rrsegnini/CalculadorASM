@@ -71,7 +71,7 @@ loop:
 	jmp	SALIR
 
 
-
+;-------------------------------------------------
 bin_num:
 	cmp	byte[operation + EBX], 'b'
 	je	b
@@ -142,7 +142,7 @@ oct_num:
 	jmp	loop
 	
 o:
-	mov	byte[pilaPosfijo+EDX], 'h'
+	mov	byte[pilaPosfijo+EDX], 'o'
 	inc	EBX
 	inc 	EDX
 	jmp	oct_num
@@ -162,6 +162,12 @@ Cero_siete:
 
 ;-------------------------------------------------
 dec_num:
+	mov	byte[pilaPosfijo+EDX], 'd'
+	;inc	EBX
+	inc 	EDX
+
+dec_num2:
+
 	cmp	byte[operation + EBX], '0'
 	jge	Cero_nueve
 
@@ -178,7 +184,7 @@ Cero_nueve:
 	pop 	EAX
 	inc	EBX
 	inc 	EDX
-	jmp	dec_num		
+	jmp	dec_num2		
 ;-------------------------------------------------
 
 pila_vacia:

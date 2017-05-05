@@ -19,6 +19,8 @@
 	sum2		db	'          ', 0
 	contador	dw	0
 	total		db	'0000000000', 0
+	final		dd	0
+	cont_op		dw	0
 
 		
 
@@ -42,57 +44,61 @@
 	;mov	ECX, 0
 cont:					;Posicionarse en el ultimo digito del string
 	cmp	byte[operation+EBX], 0
-	je	convertir
-	inc	EBX	
+	je	preconvertir
+	inc	EBX
+	add	dword[final], 1	
 	jmp	cont
-
+preconvertir:
+	sub	dword[final], 2
+	mov	dword[cont_op], EBX
 convertir:
-	dec	EBX
+	;dec	EBX
+	sub	dword[cont_op], 1
+	;PutStr	msg_ayuda
+	;PutStr	number1
+	;PutLInt	EBX
+	;nwln
 		
 	sub	AL, AL
+	mov	EBX, dword[cont_op]
 	mov	AL, byte[operation+EBX]
 	mov	byte[number1 + 9], AL 
 	
-	;PutLInt	EBX
-	;nwln
-	
-	;pushfd
-	push EBX
+	;PutStr	msg_ayuda
+	;PutStr	number1
 	
 	
 	powOchoASCII byte[contador]
-	PutStr	potencia
+
+	;powOchoASCII 3
 	
+	;PutStr potencia
 	nwln
+	stringToInt potencia
+	;PutLInt	EAX
+nwln
+	mulASCII number1, EAX
+	;mulASCII number1, 3
+	addASCII total, sum
 	
 	
-	;stringToInt potencia
-	;mov	byte[potencia], '2'
-	PutStr	potencia
-	
-
-	;mulASCII number1, EAX
-	
-
+	mov	EAX, dword[final]
 		
-	;PutInt	[contador]
-	nwln
-	cmp	byte[contador], 1
+	cmp	byte[contador], AL
+	
 	je	SALIR_oct
+	
 	add 	byte[contador], 1
 	
 	
-	;PutStr	total
-	;nwln
-	;PutStr	number1
-	;nwln
-	pop EBX
+	
 	jmp	convertir
-	
-	
+		
 	
 	;popfd	;PutStr	sum
 	nwln
 SALIR_oct:
-	;popfd
+	
+	PutStr	total
+	nwln
 	.EXIT

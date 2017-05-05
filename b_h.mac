@@ -1,5 +1,5 @@
 
-%include "io.mac"
+;%include "io.mac"
 
 ;;----------------------------------------------------------------
 ;;----------------------------------------------------------------
@@ -50,7 +50,7 @@ recorrer:
 	call	pow
 	
 	;PutLInt	EBX
-	nwln
+	;nwln
 
 	inc	EDX
 	loop	recorrer
@@ -110,10 +110,10 @@ bF_dF_frac_2:
 	inc	EDX
 	push	EDX
 	;PutLInt	EDX
-	nwln
+	;nwln
 	mov	EAX, 0
 	mov 	AL, byte[%1 + EDX]
-	PutCh	AL
+	;PutCh	AL
 	;nwln
 	cmp	AL, 0		;SALIR SI LLEGA AL FINAL DEL STRING
 	je	bF_dF_salir
@@ -252,6 +252,24 @@ SALIR:
 	cmp	BH, 1
 	je	pow_uno
 
+vaciar_potencia:
+	mov	ECX, 0
+vaciar_potencia_2:
+	
+	
+	mov	byte[potencia+ECX],  '0'
+	mov	byte[ocho1+ECX], '0'
+	mov	byte[ocho2+ECX], '0'
+
+
+	inc	CX
+	cmp	CX, 10
+	je	salir_vaciar_potencia
+	jmp	vaciar_potencia_2
+salir_vaciar_potencia:
+	mov	byte[ocho1+9], '8'
+	mov	byte[ocho2+9], '8'
+
 sum_loop_1:
 	mov	BL, 8
 sum_loop:
@@ -314,9 +332,10 @@ Repetir:
 	je	SALIR_pow
 	dec	BH
 	mov	ECX, 0
+	push	EDX
 mover_operandos_2:
 
-	push	EDX
+	
 	mov	DL, byte[potencia+ECX]
 	mov	byte[potencia+ECX],  '0'
 	mov	byte[ocho1+ECX], DL
@@ -341,7 +360,24 @@ pow_cero:
 	jmp SALIR_pow
 
 pow_uno:
+	mov	ECX, 0
+	;push	EDX
+pow_uno_1:
 	
+	;mov	DL, byte[potencia+ECX]
+	mov	byte[potencia+ECX],  '0'
+	;mov	byte[ocho1+ECX], DL
+	;mov	byte[ocho2+ECX], DL
+
+
+	inc	CX
+	cmp	CX, 10
+	je	salir_pow_uno
+	jmp	pow_uno_1
+
+salir_pow_uno:
+	;pop EDX
+	;PutStr	sum_msg
 	mov	byte[potencia + 9], '8'
 	
 
@@ -372,8 +408,8 @@ cond:
      jmp cond
 
 question:
-     PutLInt EAX
-     nwln
+     ;PutLInt EAX
+     ;nwln
  
      jmp done
 
@@ -402,7 +438,7 @@ copiar_num_mul:
 	;push	EDX
 	mov	DL, byte[%1+ECX]
 	mov	byte[number2+ECX], DL
-	
+	mov	byte[sum+ECX],  '0'
 	inc	CX
 	cmp	CX, 10
 	je	sum_loop_mul
@@ -424,9 +460,9 @@ add_loop_mul:
 	mov	[sum+ESI], AL
 	dec	ESI
 	loop	add_loop_mul
-	;mov	[sum+ESI], 
-	PutStr	sum_msg
-	PutStr	sum
+	 
+	;PutStr	sum_msg
+	;PutStr	sum
 	nwln
 	
 
@@ -434,22 +470,18 @@ add_loop_mul:
 	je	SALIR_mul
 	dec	EBX
 	
-	;push	ECX	;Para conservar el ECX
-	;PutStr	sum
-nwln
+	nwln
 	mov	ECX, 0
 mover_operando_mul:
 	
 	
 	;push	EDX
 	mov	DL, byte[sum+ECX]
-	mov	byte[sum+ECX],  ' '
-	;PutCh	DL
-	;nwln
+	mov	byte[sum+ECX],  '0'
 	mov	byte[%1+ECX], DL
-	;sub	[sum], ECX
 	
-	PutStr	number1
+	
+	;PutStr	number1
 	nwln
 	inc	CX
 	cmp	CX, 10
@@ -457,7 +489,6 @@ mover_operando_mul:
 	jmp	mover_operando_mul
 
 salir_mover_operandos_mul:
-	;pop 	EDX
 	jmp	sum_loop_mul
 
 
@@ -477,12 +508,16 @@ Uno_mul_2:
 
 SALIR_mul:
 	mov	ECX, 0
+	;PutStr	sum_msg
+	;PutStr	sum
+	;nwln
 SALIR_mul_1:
 	
-	mov	DL, byte[sum+ECX]
-	mov	byte[sum+ECX],  '0'
+	
+	;mov	DL, byte[sum+ECX]
+	;mov	byte[sum+ECX],  '0'
 	mov	byte[%1+ECX],  '0'
-	mov	byte[total+ECX], DL
+	;mov	byte[total+ECX], DL
 	
 	inc	CX
 	cmp	CX, 10
@@ -495,6 +530,38 @@ SALIR_mul_2:
 %endmacro
 
 
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------
+%macro	addASCII 2
+	pushfd	;Conservar el estado de todos los registros de 32bits
+	
+	mov	ESI, 9
+	mov	ECX, 10
+	clc
+
+add_loop_add:
+	;sub	AH, AH
+	mov	AL, [%1+ESI]
+	adc	AL, [%2+ESI]
+	aaa
+	pushf
+	or	AL, 30h
+	popf
+	mov	[total+ESI], AL
+	dec	ESI
+	loop	add_loop_add
+	
+	;PutStr	sum_msg
+	;PutStr	total
+	;nwln
+
+	
+
+
+SALIR:
+	popfd
+
+%endmacro
 
 
 

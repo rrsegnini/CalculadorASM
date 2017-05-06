@@ -41,7 +41,6 @@
 	GetStr	operation
 
 	mov	EBX, 0
-	;mov	ECX, 0
 cont:					;Posicionarse en el ultimo digito del string
 	cmp	byte[operation+EBX], 0
 	je	preconvertir
@@ -52,31 +51,22 @@ preconvertir:
 	sub	dword[final], 2
 	mov	dword[cont_op], EBX
 convertir:
-	;dec	EBX
+
 	sub	dword[cont_op], 1
-	;PutStr	msg_ayuda
-	;PutStr	number1
-	;PutLInt	EBX
-	;nwln
+	
 		
 	sub	AL, AL
 	mov	EBX, dword[cont_op]
 	mov	AL, byte[operation+EBX]
 	mov	byte[number1 + 9], AL 
 	
-	;PutStr	msg_ayuda
-	;PutStr	number1
-	
-	
 	powDosASCII byte[contador]
 
 
 	nwln
 	stringToInt potencia
-	PutLInt	EAX
 nwln
 	mulASCII number1, EAX
-	;mulASCII number1, 3
 	addASCII total, sum
 	
 	
@@ -93,14 +83,11 @@ nwln
 	jmp	convertir
 		
 	
-	;popfd	;PutStr	sum
+	;popfd	
 	nwln
 SALIR_oct:
 	
-	PutStr	total
-	
-	;stringToInt	total
-	;PutLInt	EAX
+	PutStr	operation
 	nwln
 	.EXIT
 

@@ -389,14 +389,14 @@ SALIR_pow:
 ;;----------------------------------------------------------------
 %macro stringToInt 1
 
-reading:
+%%reading:
      sub     EAX, EAX
      mov     EBX, %1
      
-cond:   
+%%cond:   
      mov     DX, 10
      cmp     byte[EBX], 0
-     je      question
+     je      %%question
      
    
      sub     byte[EBX], '0'
@@ -405,16 +405,16 @@ cond:
      mov     CL, byte[EBX]
      add     EAX, ECX
      inc     EBX 
-     jmp cond
+     jmp     %%cond
 
-question:
+%%question:
      ;PutLInt EAX
      ;nwln
  
-     jmp done
+     jmp %%done
 
 
-done:
+%%done:
      
 
 
@@ -564,5 +564,467 @@ SALIR:
 %endmacro
 
 
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------
+%macro	prioridades 2
+
+DP:				;Dentro de la pila
+	cmp	%1, '('
+	je	parentesisDP
+	cmp	%1, '+'
+	je	masDP
+	cmp	%1, '-'
+	je	menosDP
+	cmp	%1, '*'
+	je	porDP
+	cmp	%1, '/'
+	je	divisionDP
+	cmp	%1, '^'
+	je	powDP
+	jmp	ERROR_prioridades
+
+FP:				;Fuera de la pila
+	cmp	%2, '('
+	je	parentesisFP
+	cmp	%2, '+'
+	je	masFP
+	cmp	%2, '-'
+	je	menosFP
+	cmp	%2, '*'
+	je	porFP
+	cmp	%2, '/'
+	je	divisionFP
+	cmp	%2, '^'
+	je	powFP
+	jmp	ERROR_prioridades
+
+parentesisDP:
+	mov	byte[PDP ], 0
+	jmp	FP
+masDP:
+	mov	byte[PDP], 1
+	jmp	FP
+menosDP:
+	mov	byte[PDP], 1
+	jmp	FP
+porDP:
+	mov	byte[PDP], 2
+	jmp	FP
+divisionDP:
+	mov	byte[PDP], 2
+	jmp	FP
+powDP:
+	mov	byte[PDP], 3
+	jmp	FP
 
 
+parentesisFP:
+	mov	byte[PFP], 0
+	jmp	compare
+masFP:
+	mov	byte[PFP], 1
+	jmp	compare
+menosFP:
+	mov	byte[PFP], 1
+	jmp	compare
+porFP:
+	mov	byte[PFP], 2
+	jmp	compare
+divisionFP:
+	mov	byte[PFP], 2
+	jmp	compare
+powFP:
+	mov	byte[PFP], 3
+	jmp	compare
+
+compare:
+	push	EAX
+	mov	AL, byte[PFP]	
+	cmp	byte[PDP], AL
+	pop	EAX
+	jge	cambiar
+	jmp	meter
+cambiar:
+	mov	byte[pilaPosfijo+EDX], %1
+	mov	AL, %2
+	push	EAX
+	jmp	SALIR_prioridades
+
+meter:
+	push	EAX
+	mov	AL, %2
+	push EAX
+	jmp	SALIR_prioridades
+
+ERROR_prioridades:
+
+SALIR_prioridades:
+	
+%endmacro
+
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------
+%macro	powDosASCII 1
+
+	pushfd	;Conservar el estado de todos los registros de 32bits
+	
+
+	mov	BH, %1
+	
+	cmp	BH, 0
+	je	pow_cero
+	cmp	BH, 1
+	je	pow_uno
+
+vaciar_potencia:
+	mov	ECX, 0
+vaciar_potencia_2:
+	
+	
+	mov	byte[potencia+ECX],  '0'
+	mov	byte[ocho1+ECX], '0'
+	mov	byte[ocho2+ECX], '0'
+
+
+	inc	CX
+	cmp	CX, 10
+	je	salir_vaciar_potencia
+	jmp	vaciar_potencia_2
+salir_vaciar_potencia:
+	mov	byte[ocho1+9], '2'
+	mov	byte[ocho2+9], '2'
+
+sum_loop_1:
+	mov	BL, 2
+sum_loop:
+	mov	ESI, 9
+	mov	ECX, 10
+	clc
+add_loop:
+	mov	AL, [ocho1+ESI]
+	adc	AL, [ocho2+ESI]
+	aaa
+	pushf
+	or	AL, 30h
+	popf
+	mov	[potencia+ESI], AL
+	dec	ESI
+	loop	add_loop
+	;mov	[potencia+ESI], 
+	;PutStr	sum_msg
+	;PutStr	potencia
+	;nwln
+	
+
+	cmp	BL, 2
+	je	Repetir
+	dec	BL
+	
+	
+nwln
+	mov	ECX, 0
+	push	EDX
+mover_operando:
+	
+	
+	
+	mov	DL, byte[potencia+ECX]
+	mov	byte[potencia+ECX],  '0'
+	;PutCh	DL
+	;nwln
+	mov	byte[ocho1+ECX], DL
+	;sub	[potencia], ECX
+	
+	;PutStr	number1
+	;nwln
+	inc	CX
+	cmp	CX, 10
+	je	salir_mover_operandos
+	jmp	mover_operando
+
+salir_mover_operandos:
+	pop 	EDX
+	jmp	sum_loop
+
+
+
+
+	
+Repetir:
+	
+	cmp	BH, 2
+	je	SALIR_pow
+	dec	BH
+	mov	ECX, 0
+	push	EDX
+mover_operandos_2:
+
+	
+	mov	DL, byte[potencia+ECX]
+	mov	byte[potencia+ECX],  '0'
+	mov	byte[ocho1+ECX], DL
+	mov	byte[ocho2+ECX], DL
+
+	;PutStr	ocho1
+	;nwln
+	;PutStr	ocho2
+
+	inc	CX
+	cmp	CX, 10
+	je	salir_mover_operandos_2
+	jmp	mover_operandos_2
+
+salir_mover_operandos_2:
+	pop EDX
+	jmp	sum_loop_1
+
+
+pow_cero:
+	mov	byte[potencia + 9], '1'
+	jmp SALIR_pow
+
+pow_uno:
+	mov	ECX, 0
+	;push	EDX
+pow_uno_1:
+	
+	;mov	DL, byte[potencia+ECX]
+	mov	byte[potencia+ECX],  '0'
+	;mov	byte[ocho1+ECX], DL
+	;mov	byte[ocho2+ECX], DL
+
+
+	inc	CX
+	cmp	CX, 10
+	je	salir_pow_uno
+	jmp	pow_uno_1
+
+salir_pow_uno:
+	;pop EDX
+	;PutStr	sum_msg
+	mov	byte[potencia + 9], '2'
+	
+
+SALIR_pow:
+	popfd
+%endmacro
+
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------
+
+%macro	posfijo 0
+	mov	EBX, 0		;Desplazamiento para recorrer el string
+	mov	byte[pilaPosfijo], '#'	
+	mov	CX, 264	
+	mov	EAX, 0
+	mov	AL, '#'
+	push	EAX	;Pila vacia
+	mov	EDX, 0		;Contador para la pila posfijo
+	
+	;GetStr	operation
+	
+reading:
+	cmp	byte[operation + EBX], 0	;SALTA SI LELGA AL FINAL DE STRING
+	je	SALIR_posfijo
+	
+	cmp	byte[operation + EBX], 'b'	;Si es binario
+	je	bin_num
+
+	cmp	byte[operation + EBX], 'h'	;Si es hexadecimal
+	je	hex_num
+
+	cmp	byte[operation + EBX], 'o'	;Si es octal
+	je	oct_num
+
+	cmp	byte[operation + EBX], '0'	;Si es decimal
+	jge	dec_num
+	
+	pop	EAX
+	cmp	EAX, '#'			;Si la pila esta vacia
+	je	pila_vacia
+	push	EAX	
+	
+	cmp	byte[operation + EBX], ')'			;Si se encuentra un parentesis de cierre
+	je	vaciar_pila
+
+	pop	EAX
+	prioridades AL, byte[operation + EBX] ;Compara prioridades DENTRO DE LA PILA (%1) y FUERA DE LA PILA (%2)
+	inc	EBX
+
+loop1:
+	;loop	reading
+	dec	ECX
+	jnz	reading
+	jmp	SALIR_posfijo
+
+
+;-------------------------------------------------
+bin_num:
+	cmp	byte[operation + EBX], 'b'
+	je	b
+
+	cmp	byte[operation + EBX], '0'
+	je	Cero_posfijo
+	
+	cmp	byte[operation + EBX], '1'
+	je	Uno_posfijo
+	jg	ERROR
+
+	jmp	loop1
+b:
+	mov	byte[pilaPosfijo+EDX], 'b'
+	inc	EBX
+	inc 	EDX
+	jmp	bin_num
+
+Cero_posfijo:	
+	mov	byte[pilaPosfijo+EDX], '0'
+	inc	EBX
+	inc 	EDX
+	jmp	bin_num
+Uno_posfijo:	
+	mov	byte[pilaPosfijo+EDX], '1'
+	inc	EBX
+	inc 	EDX
+	jmp	bin_num	
+
+;-------------------------------------------------
+hex_num:
+	cmp	byte[operation + EBX], 'h'
+	je	h
+	
+	cmp	byte[operation + EBX], '0'
+	jge	Cero_F
+
+	jmp	loop1
+	
+h:
+	mov	byte[pilaPosfijo+EDX], 'h'
+	inc	EBX
+	inc 	EDX
+	jmp	hex_num
+
+	
+Cero_F:
+	cmp	byte[operation + EBX], 'F'
+	jg	ERROR
+	
+	push	EAX
+	mov	AL, byte[operation + EBX]
+	mov	byte[pilaPosfijo+EDX], AL
+	pop 	EAX
+	inc	EBX
+	inc 	EDX
+	jmp	hex_num
+
+
+;-------------------------------------------------	
+oct_num:
+	cmp	byte[operation + EBX], 'o'
+	je	o
+	
+	cmp	byte[operation + EBX], '0'
+	jge	Cero_siete
+
+	jmp	loop1
+	
+o:
+	mov	byte[pilaPosfijo+EDX], 'o'
+	inc	EBX
+	inc 	EDX
+	jmp	oct_num
+
+	
+Cero_siete:
+	cmp	byte[operation + EBX], '7'
+	jg	ERROR
+	
+	push	EAX
+	mov	AL, byte[operation + EBX]
+	mov	byte[pilaPosfijo+EDX], AL
+	pop 	EAX
+	inc	EBX
+	inc 	EDX
+	jmp	oct_num
+
+;-------------------------------------------------
+dec_num:
+	mov	byte[pilaPosfijo+EDX], 'd'
+	;inc	EBX
+	inc 	EDX
+
+dec_num2:
+
+	cmp	byte[operation + EBX], '0'
+	jge	Cero_nueve
+
+	jmp	loop1
+	
+	
+Cero_nueve:
+	cmp	byte[operation + EBX], '9'
+	jg	ERROR
+	
+	push	EAX
+	mov	AL, byte[operation + EBX]
+	mov	byte[pilaPosfijo+EDX], AL
+	pop 	EAX
+	inc	EBX
+	inc 	EDX
+	jmp	dec_num2		
+;-------------------------------------------------
+
+pila_vacia:
+	push	EAX
+	mov	AL, byte[operation + EBX]
+	push	EAX
+	inc	EBX
+	jmp	loop1
+
+;-------------------------------------------------
+
+vaciar_pila:
+	pop	EAX
+	nwln
+	cmp	AL, '('
+	je	vaciar_pila_salir
+	
+	mov	byte[pilaPosfijo + EDX], AL
+	inc	EDX
+	jmp	vaciar_pila
+vaciar_pila_salir:	
+	inc	EBX
+	jmp	loop1
+;-------------------------------------------------
+
+ERROR:
+	PutStr	error_msg
+	nwln
+	.EXIT
+	
+
+
+SALIR_posfijo:	
+	
+	pop	EAX
+	PutCh	AL
+	nwln
+	cmp	AL, '#'
+	je	SALIR_posfijo_2
+	
+	mov	byte[pilaPosfijo + EDX], AL
+	inc	EDX
+	jmp	SALIR_posfijo
+
+SALIR_posfijo_2:	
+	inc	EBX
+	
+
+	PutStr pilaPosfijo
+	nwln
+
+%endmacro
+
+
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------

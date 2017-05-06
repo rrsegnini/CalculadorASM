@@ -68,12 +68,14 @@ convertir:
 	;PutStr	number1
 	
 	
-	powDosASCII byte[contador]
+	powOchoASCII byte[contador]
 
-
+	;powOchoASCII 3
+	
+	;PutStr potencia
 	nwln
 	stringToInt potencia
-	PutLInt	EAX
+	;PutLInt	EAX
 nwln
 	mulASCII number1, EAX
 	;mulASCII number1, 3
@@ -99,8 +101,8 @@ SALIR_oct:
 	
 	PutStr	total
 	
-	;stringToInt	total
-	;PutLInt	EAX
+	stringToInt	total
+	PutLInt	EAX
 	nwln
 	.EXIT
 

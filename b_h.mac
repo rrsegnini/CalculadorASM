@@ -297,7 +297,7 @@ add_loop:
 	dec	BL
 	
 	
-nwln
+;nwln
 	mov	ECX, 0
 	push	EDX
 mover_operando:
@@ -463,14 +463,14 @@ add_loop_mul:
 	 
 	;PutStr	sum_msg
 	;PutStr	sum
-	nwln
+	;nwln
 	
 
 	cmp	EBX, 2
 	je	SALIR_mul
 	dec	EBX
 	
-	nwln
+	;nwln
 	mov	ECX, 0
 mover_operando_mul:
 	
@@ -482,7 +482,7 @@ mover_operando_mul:
 	
 	
 	;PutStr	number1
-	nwln
+	;nwln
 	inc	CX
 	cmp	CX, 10
 	je	salir_mover_operandos_mul
@@ -721,7 +721,7 @@ add_loop:
 	dec	BL
 	
 	
-nwln
+;nwln
 	mov	ECX, 0
 	push	EDX
 mover_operando:
@@ -985,7 +985,7 @@ pila_vacia:
 
 vaciar_pila:
 	pop	EAX
-	nwln
+	;nwln
 	cmp	AL, '('
 	je	vaciar_pila_salir
 	
@@ -1025,6 +1025,89 @@ SALIR_posfijo_2:
 
 %endmacro
 
+
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------
+
+
+%macro	b_d	1
+	;pushfd	;Conservar el estado de todos los registros de 32bits
+	PutStr	%1
+	;GetStr	operation
+	mov	ECX, 0
+reset:
+	;mov	byte[potencia+ECX],  '0'
+	mov	byte[potencia+ECX], '0'
+	mov	byte[total+ECX], '0'
+	mov	byte[sum+ECX], ' '
+
+	inc	CX
+	cmp	CX, 10
+	je	salir_reset
+	jmp	reset
+
+salir_reset:
+	mov	dword[final], 0
+	mov	dword[contador], 0
+	mov	EBX, 0
+	;mov	ECX, 0
+	
+cont:					;Posicionarse en el ultimo digito del string
+	cmp	byte[%1+EBX], 0
+	je	preconvertir
+	inc	EBX
+	add	dword[final], 1	
+	jmp	cont
+preconvertir:
+	sub	dword[final], 2
+	mov	dword[cont_op], EBX
+convertir:
+
+	sub	dword[cont_op], 1
+	
+		
+	sub	AL, AL
+	mov	EBX, dword[cont_op]
+	mov	AL, byte[%1+EBX]
+	;mov	byte[%1+EBX], '0' 
+	mov	byte[number1 + 9], AL 
+	
+	;PutLInt	dword[contador]	
+	;nwln
+	powDosASCII byte[contador]
+
+
+	;nwln
+	stringToInt potencia
+;nwln
+	mulASCII number1, EAX
+	addASCII total, sum
+	
+	
+	mov	EAX, dword[final]
+		
+	cmp	byte[contador], AL
+	
+	je	SALIR_oct
+	
+	add 	byte[contador], 1
+	
+	
+	
+	jmp	convertir
+		
+	
+	;popfd	
+	;nwln
+SALIR_oct:
+	
+	;PutStr	total
+	stringToInt	total
+	nwln
+	;PutLInt EAX
+
+	
+%endmacro
 
 ;;----------------------------------------------------------------
 ;;----------------------------------------------------------------

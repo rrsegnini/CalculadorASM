@@ -248,13 +248,13 @@ SALIR:
 	mov	BH, %1
 	
 	cmp	BH, 0
-	je	pow_cero
+	je	%%pow_cero
 	cmp	BH, 1
-	je	pow_uno
+	je	%%pow_uno
 
-vaciar_potencia:
+%%vaciar_potencia:
 	mov	ECX, 0
-vaciar_potencia_2:
+%%vaciar_potencia_2:
 	
 	
 	mov	byte[potencia+ECX],  '0'
@@ -264,19 +264,19 @@ vaciar_potencia_2:
 
 	inc	CX
 	cmp	CX, 10
-	je	salir_vaciar_potencia
-	jmp	vaciar_potencia_2
-salir_vaciar_potencia:
+	je	%%salir_vaciar_potencia
+	jmp	%%vaciar_potencia_2
+%%salir_vaciar_potencia:
 	mov	byte[ocho1+9], '8'
 	mov	byte[ocho2+9], '8'
 
-sum_loop_1:
+%%sum_loop_1:
 	mov	BL, 8
-sum_loop:
+%%sum_loop:
 	mov	ESI, 9
 	mov	ECX, 10
 	clc
-add_loop:
+%%add_loop:
 	mov	AL, [ocho1+ESI]
 	adc	AL, [ocho2+ESI]
 	aaa
@@ -285,22 +285,19 @@ add_loop:
 	popf
 	mov	[potencia+ESI], AL
 	dec	ESI
-	loop	add_loop
-	;mov	[potencia+ESI], 
-	;PutStr	sum_msg
-	;PutStr	potencia
-	;nwln
+	loop	%%add_loop
+	
 	
 
 	cmp	BL, 2
-	je	Repetir
+	je	%%Repetir
 	dec	BL
 	
 	
 ;nwln
 	mov	ECX, 0
 	push	EDX
-mover_operando:
+%%mover_operando:
 	
 	
 	
@@ -315,25 +312,25 @@ mover_operando:
 	;nwln
 	inc	CX
 	cmp	CX, 10
-	je	salir_mover_operandos
-	jmp	mover_operando
+	je	%%salir_mover_operandos
+	jmp	%%mover_operando
 
-salir_mover_operandos:
+%%salir_mover_operandos:
 	pop 	EDX
-	jmp	sum_loop
+	jmp	%%sum_loop
 
 
 
 
 	
-Repetir:
+%%Repetir:
 	
 	cmp	BH, 2
-	je	SALIR_pow
+	je	%%SALIR_pow
 	dec	BH
 	mov	ECX, 0
 	push	EDX
-mover_operandos_2:
+%%mover_operandos_2:
 
 	
 	mov	DL, byte[potencia+ECX]
@@ -341,28 +338,25 @@ mover_operandos_2:
 	mov	byte[ocho1+ECX], DL
 	mov	byte[ocho2+ECX], DL
 
-	;PutStr	ocho1
-	;nwln
-	;PutStr	ocho2
-
+	
 	inc	CX
 	cmp	CX, 10
-	je	salir_mover_operandos_2
-	jmp	mover_operandos_2
+	je	%%salir_mover_operandos_2
+	jmp	%%mover_operandos_2
 
-salir_mover_operandos_2:
+%%salir_mover_operandos_2:
 	pop EDX
-	jmp	sum_loop_1
+	jmp	%%sum_loop_1
 
 
-pow_cero:
+%%pow_cero:
 	mov	byte[potencia + 9], '1'
-	jmp SALIR_pow
+	jmp 	%%SALIR_pow
 
-pow_uno:
+%%pow_uno:
 	mov	ECX, 0
 	;push	EDX
-pow_uno_1:
+%%pow_uno_1:
 	
 	;mov	DL, byte[potencia+ECX]
 	mov	byte[potencia+ECX],  '0'
@@ -372,16 +366,16 @@ pow_uno_1:
 
 	inc	CX
 	cmp	CX, 10
-	je	salir_pow_uno
-	jmp	pow_uno_1
+	je	%%salir_pow_uno
+	jmp	%%pow_uno_1
 
-salir_pow_uno:
+%%salir_pow_uno:
 	;pop EDX
 	;PutStr	sum_msg
 	mov	byte[potencia + 9], '8'
 	
 
-SALIR_pow:
+%%SALIR_pow:
 	popfd
 %endmacro
 
@@ -428,29 +422,29 @@ SALIR_pow:
 	
 	mov	EBX, %2
 	cmp	EBX, 1
-	je	Uno_mul
+	je	%%Uno_mul
 
 	cmp	EBX, 0
-	je	SALIR_mul_2
+	je	%%SALIR_mul_2
 	
 	mov	ECX, 0
-copiar_num_mul:
+%%copiar_num_mul:
 	;push	EDX
 	mov	DL, byte[%1+ECX]
 	mov	byte[number2+ECX], DL
 	mov	byte[sum+ECX],  '0'
 	inc	CX
 	cmp	CX, 10
-	je	sum_loop_mul
-	jmp	copiar_num_mul
+	je	%%sum_loop_mul
+	jmp	%%copiar_num_mul
 
 
 
-sum_loop_mul:
+%%sum_loop_mul:
 	mov	ESI, 9
 	mov	ECX, 10
 	clc
-add_loop_mul:
+%%add_loop_mul:
 	mov	AL, [%1+ESI]
 	adc	AL, [number2+ESI]
 	aaa
@@ -459,7 +453,7 @@ add_loop_mul:
 	popf
 	mov	[sum+ESI], AL
 	dec	ESI
-	loop	add_loop_mul
+	loop	%%add_loop_mul
 	 
 	;PutStr	sum_msg
 	;PutStr	sum
@@ -467,12 +461,12 @@ add_loop_mul:
 	
 
 	cmp	EBX, 2
-	je	SALIR_mul
+	je	%%SALIR_mul
 	dec	EBX
 	
 	;nwln
 	mov	ECX, 0
-mover_operando_mul:
+%%mover_operando_mul:
 	
 	
 	;push	EDX
@@ -485,33 +479,33 @@ mover_operando_mul:
 	;nwln
 	inc	CX
 	cmp	CX, 10
-	je	salir_mover_operandos_mul
-	jmp	mover_operando_mul
+	je	%%salir_mover_operandos_mul
+	jmp	%%mover_operando_mul
 
-salir_mover_operandos_mul:
-	jmp	sum_loop_mul
+%%salir_mover_operandos_mul:
+	jmp	%%sum_loop_mul
 
 
-Uno_mul:
+%%Uno_mul:
 	mov	ECX, 0
-Uno_mul_2:	
+%%Uno_mul_2:	
 	
 	mov	DL, byte[%1+ECX]
 	mov	byte[sum+ECX], DL
 	
 	inc	CX
 	cmp	CX, 10
-	je	SALIR_mul
-	jmp	Uno_mul_2
+	je	%%SALIR_mul
+	jmp	%%Uno_mul_2
 	
 
 
-SALIR_mul:
+%%SALIR_mul:
 	mov	ECX, 0
 	;PutStr	sum_msg
 	;PutStr	sum
 	;nwln
-SALIR_mul_1:
+%%SALIR_mul_1:
 	
 	
 	;mov	DL, byte[sum+ECX]
@@ -521,10 +515,10 @@ SALIR_mul_1:
 	
 	inc	CX
 	cmp	CX, 10
-	je	SALIR_mul_2
-	jmp	SALIR_mul_1
+	je	%%SALIR_mul_2
+	jmp	%%SALIR_mul_1
 	
-SALIR_mul_2:
+%%SALIR_mul_2:
 
 	
 %endmacro
@@ -539,7 +533,7 @@ SALIR_mul_2:
 	mov	ECX, 10
 	clc
 
-add_loop_add:
+%%add_loop_add:
 	;sub	AH, AH
 	mov	AL, [%1+ESI]
 	adc	AL, [%2+ESI]
@@ -549,16 +543,13 @@ add_loop_add:
 	popf
 	mov	[total+ESI], AL
 	dec	ESI
-	loop	add_loop_add
+	loop	%%add_loop_add
 	
-	;PutStr	sum_msg
-	;PutStr	total
-	;nwln
 
 	
 
 
-SALIR:
+%%SALIR:
 	popfd
 
 %endmacro
@@ -1033,9 +1024,9 @@ SALIR_posfijo_2:
 %macro	b_d	1
 	;pushfd	;Conservar el estado de todos los registros de 32bits
 	PutStr	%1
-	;GetStr	operation
+	
 	mov	ECX, 0
-reset:
+%%reset:
 	;mov	byte[potencia+ECX],  '0'
 	mov	byte[potencia+ECX], '0'
 	mov	byte[total+ECX], '0'
@@ -1043,25 +1034,25 @@ reset:
 
 	inc	CX
 	cmp	CX, 10
-	je	salir_reset
-	jmp	reset
+	je	%%salir_reset
+	jmp	%%reset
 
-salir_reset:
+%%salir_reset:
 	mov	dword[final], 0
 	mov	dword[contador], 0
 	mov	EBX, 0
 	;mov	ECX, 0
 	
-cont:					;Posicionarse en el ultimo digito del string
+%%cont:					;Posicionarse en el ultimo digito del string
 	cmp	byte[%1+EBX], 0
-	je	preconvertir
+	je	%%preconvertir
 	inc	EBX
 	add	dword[final], 1	
-	jmp	cont
-preconvertir:
+	jmp	%%cont
+%%preconvertir:
 	sub	dword[final], 2
 	mov	dword[cont_op], EBX
-convertir:
+%%convertir:
 
 	sub	dword[cont_op], 1
 	
@@ -1088,18 +1079,18 @@ convertir:
 		
 	cmp	byte[contador], AL
 	
-	je	SALIR_oct
+	je	%%SALIR_oct
 	
 	add 	byte[contador], 1
 	
 	
 	
-	jmp	convertir
+	jmp	%%convertir
 		
 	
 	;popfd	
 	;nwln
-SALIR_oct:
+%%SALIR_oct:
 	
 	;PutStr	total
 	stringToInt	total
@@ -1111,3 +1102,352 @@ SALIR_oct:
 
 ;;----------------------------------------------------------------
 ;;----------------------------------------------------------------
+
+
+
+%macro	o_d	1
+	PutStr	%1
+	nwln
+	mov	ECX, 0
+%%reset_oct:
+	;mov	byte[potencia+ECX],  '0'
+	mov	byte[potencia+ECX], '0'
+	mov	byte[total+ECX], '0'
+	mov	byte[sum+ECX], ' '
+
+	inc	CX
+	cmp	CX, 10
+	je	%%salir_reset_oct
+	jmp	%%reset_oct
+
+%%salir_reset_oct:
+	mov	dword[final], 0
+	mov	dword[contador], 0
+	mov	EBX, 0
+	;mov	ECX, 0
+
+	mov	EBX, 0
+	;mov	ECX, 0
+cont:					;Posicionarse en el ultimo digito del string
+	cmp	byte[%1+EBX], 0
+	je	preconvertir
+	inc	EBX
+	add	dword[final], 1	
+	jmp	cont
+preconvertir:
+	sub	dword[final], 2
+	mov	dword[cont_op], EBX
+convertir:
+	;dec	EBX
+	sub	dword[cont_op], 1
+	;PutStr	msg_ayuda
+	;PutStr	number1
+	;PutLInt	EBX
+	;nwln
+		
+	sub	AL, AL
+	mov	EBX, dword[cont_op]
+	mov	AL, byte[%1+EBX]
+	mov	byte[number1 + 9], AL 
+	
+	;PutStr	msg_ayuda
+	;PutStr	number1
+	
+	
+	powOchoASCII byte[contador]
+
+	
+	
+	stringToInt potencia
+	;PutLInt	EAX
+nwln
+	mulASCII number1, EAX
+	
+	addASCII total, sum
+	
+	
+	mov	EAX, dword[final]
+		
+	cmp	byte[contador], AL
+	
+	je	SALIR_oct
+	
+	add 	byte[contador], 1
+	
+	
+	
+	jmp	convertir
+		
+	
+	;popfd	;PutStr	sum
+	nwln
+SALIR_oct:
+	
+	;PutStr	total
+	
+	stringToInt	total
+	;PutLInt	EAX
+	;nwln
+	
+%endmacro
+
+
+;;----------------------------------------------------------------
+;;----------------------------------------------------------------
+
+
+
+%macro	evaluar	0
+
+	mov	EBX, 0		;Desplazamiento para recorrer el string
+	;mov	byte[pilaPosfijo], '#'	
+	mov	CX, 264	
+	mov	EAX, 0
+	mov	AL, '#'
+	push	EAX	;Pila vacia
+	mov	EDX, 0		;Contador para la pila posfijo
+	
+	;GetStr	operation
+	
+reading_e:
+	
+	cmp	byte[pilaPosfijo + EBX], 0	;SALTA SI LELGA AL FINAL DE STRING
+	je	SALIR_posfijo_2_e
+	
+	cmp	byte[pilaPosfijo + EBX], 'b'	;Si es binario
+	je	bin_num_e
+	
+	;cmp	byte[pilaPosfijo + EBX], 'h'	;Si es hexadecimal
+	;je	hex_num_e
+
+	cmp	byte[pilaPosfijo + EBX], 'o'	;Si es octal
+	je	oct_num_e
+
+	;cmp	byte[pilaPosfijo + EBX], '0'	;Si es decimal
+	;jge	dec_num_e
+
+	cmp	byte[pilaPosfijo + EBX], '+'	;Si es decimal
+	je	op_sumar_e
+	
+	cmp	byte[pilaPosfijo + EBX], '-'	;Si es decimal
+	je	op_restar_e
+	
+	
+
+
+loop1_e:
+	;loop	reading
+	;mov	EDX, 0
+	dec	ECX
+		
+	jnz	reading_e
+	jmp	SALIR_posfijo_e
+
+
+;-------------------------------------------------
+bin_num_e:
+	mov	EDX, 0
+	mov	byte[operando+EDX], 'b'
+	inc	EBX
+	inc 	EDX
+	
+b_e:	
+	cmp	byte[pilaPosfijo + EBX], '0'
+	je	Cero_e
+	
+	cmp	byte[pilaPosfijo + EBX], '1'
+	je	Uno_e
+	
+	
+	push	EBX
+	push	ECX
+	
+	;PutStr	operando
+	b_d	operando
+	
+	pop 	ECX
+	pop	EBX
+	
+	push	EAX 		;METE EL NUMERO EN ENTERO A LA PILA
+	sub	EDX, EDX
+	;jmp	SALIR_posfijo_2
+	jmp	borrar_operando
+
+
+Cero_e:	
+	mov	byte[operando+EDX], '0'
+	inc	EBX
+	inc 	EDX
+	jmp	b_e
+Uno_e:	
+	mov	byte[operando+EDX], '1'
+	inc	EBX
+	inc 	EDX
+	jmp	b_e	
+
+;-------------------------------------------------
+hex_num_e:
+	cmp	byte[pilaPosfijo + EBX], 'h'
+	je	h_e
+	
+	cmp	byte[pilaPosfijo + EBX], '0'
+	jge	Cero_F_e
+
+	jmp	loop1_e
+	
+h_e:
+	mov	byte[pilaPosfijo+EDX], 'h'
+	inc	EBX
+	inc 	EDX
+	jmp	hex_num_e
+
+	
+Cero_F_e:
+	cmp	byte[operation + EBX], 'F'
+	;jg	ERROR_e
+	
+	push	EAX
+	mov	AL, byte[operation + EBX]
+	mov	byte[pilaPosfijo+EDX], AL
+	pop 	EAX
+	inc	EBX
+	inc 	EDX
+	jmp	hex_num_e
+
+
+;-------------------------------------------------	
+oct_num_e:
+	mov	EDX, 0
+	mov	byte[operando+EDX], 'o'
+	inc	EBX
+	inc 	EDX
+o_e:
+	
+	cmp	byte[pilaPosfijo + EBX], '0'
+	jge	Cero_siete_e
+	jmp	Next
+
+	
+Cero_siete_e:
+	cmp	byte[pilaPosfijo + EBX], '7'
+	jg	Next
+	
+	push	EAX
+	mov	AL, byte[pilaPosfijo + EBX]
+	mov	byte[operando+EDX], AL
+	pop 	EAX
+	inc	EBX
+	inc 	EDX
+	jmp	o_e
+Next:
+	push	EBX
+	push	ECX
+	
+	o_d	operando
+	
+	pop 	ECX
+	pop	EBX
+	
+	push	EAX 		;METE EL NUMERO EN ENTERO A LA PILA
+	sub	EDX, EDX
+	
+	jmp	borrar_operando
+
+;-------------------------------------------------
+dec_num_e:
+	mov	byte[pilaPosfijo+EDX], 'd'
+	;inc	EBX
+	inc 	EDX
+
+dec_num2_e:
+
+	cmp	byte[operation + EBX], '0'
+	jge	Cero_nueve_e
+
+	jmp	loop1_e
+	
+	
+Cero_nueve_e:
+	cmp	byte[operation + EBX], '9'
+	;jg	ERROR_e
+	
+	push	EAX
+	mov	AL, byte[operation + EBX]
+	mov	byte[pilaPosfijo+EDX], AL
+	pop 	EAX
+	inc	EBX
+	inc 	EDX
+	jmp	dec_num2_e		
+;-------------------------------------------------
+
+
+SALIR_posfijo_e:	
+	
+	pop	EAX
+	PutCh	AL
+	nwln
+	cmp	AL, '#'
+	je	SALIR_posfijo_2_e
+	
+	mov	byte[pilaPosfijo + EDX], AL
+	inc	EDX
+	jmp	SALIR_posfijo_e
+
+
+
+;-------------------------------------------------
+op_sumar_e:
+	pop	EAX
+	mov	dword[segundo_operando], EAX
+	pop	EAX
+	mov	dword[primer_operando], EAX
+	
+	push	EDX
+	mov	EDX, dword[segundo_operando]
+	mov	EAX, dword[primer_operando]
+	add	EAX, EDX
+	;PutLInt	EAX
+	pop	EDX
+	push	EAX
+	inc	EBX
+	jmp	loop1_e
+	
+
+
+op_restar_e:
+	pop	EAX
+	mov	dword[segundo_operando], EAX
+	pop	EAX
+	mov	dword[primer_operando], EAX
+	
+	push	EDX
+	mov	EDX, dword[segundo_operando]
+	mov	EAX, dword[primer_operando]
+	sub	EAX, EDX
+	;PutLInt	EAX
+	pop	EDX
+	push	EAX
+	jmp	loop1_e
+
+
+
+
+borrar_operando:
+	mov	EDX, 0
+borrar_operando_2:
+	cmp	byte[operando + EDX], 0
+	je	loop1_e
+	mov	byte[operando + EDX], 0
+	inc	EDX
+	
+	jmp	borrar_operando_2
+
+SALIR_posfijo_2_e:	
+	inc	EBX
+	
+	pop	EAX
+	PutStr 	resul
+	PutLInt	EAX
+	nwln
+	
+%endmacro

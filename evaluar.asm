@@ -6,11 +6,12 @@
 %include "b_h.mac"
 
 .DATA
-	;intro_posfijo		db 	"EVALUAR ", 0
+	intro_posfijo		db 	"EVALUAR ", 0
 	error_msg 	db 	"Error en los datos ingresados ", 0
+	resul		db	'Resultado: '
 	PDP		db	0
 	PFP		db	0
-	pilaPosfijo	db	'b1111b10+',0
+	pilaPosfijo	db	'b10o10+',0
 
 	;PDP		db	0
 	;PFP		db	0
@@ -62,71 +63,64 @@
 	;GetStr	operation
 	
 reading:
+	
 	cmp	byte[pilaPosfijo + EBX], 0	;SALTA SI LELGA AL FINAL DE STRING
-	je	SALIR_posfijo
+	je	SALIR_posfijo_2
 	
 	cmp	byte[pilaPosfijo + EBX], 'b'	;Si es binario
 	je	bin_num
-
-	cmp	byte[pilaPosfijo + EBX], 'h'	;Si es hexadecimal
-	je	hex_num
+	
+	;cmp	byte[pilaPosfijo + EBX], 'h'	;Si es hexadecimal
+	;je	hex_num
 
 	cmp	byte[pilaPosfijo + EBX], 'o'	;Si es octal
 	je	oct_num
 
-	cmp	byte[pilaPosfijo + EBX], '0'	;Si es decimal
-	jge	dec_num
+	;cmp	byte[pilaPosfijo + EBX], '0'	;Si es decimal
+	;jge	dec_num
 
 	cmp	byte[pilaPosfijo + EBX], '+'	;Si es decimal
 	je	op_sumar
 	
 	cmp	byte[pilaPosfijo + EBX], '-'	;Si es decimal
 	je	op_restar
-
-	pop	EAX
-	cmp	EAX, '#'			;Si la pila esta vacia
-	je	pila_vacia
-	push	EAX	
 	
-	cmp	byte[pilaPosfijo + EBX], ')'			;Si se encuentra un parentesis de cierre
-	je	vaciar_pila
+	
 
-	pop	EAX
-	prioridades AL, byte[operation + EBX] ;Compara prioridades DENTRO DE LA PILA (%1) y FUERA DE LA PILA (%2)
-	inc	EBX
 
 loop1:
 	;loop	reading
 	;mov	EDX, 0
 	dec	ECX
+		
 	jnz	reading
 	jmp	SALIR_posfijo
 
 
 ;-------------------------------------------------
 bin_num:
-	
+	mov	EDX, 0
 	mov	byte[operando+EDX], 'b'
 	inc	EBX
 	inc 	EDX
-
+	
 b:	
 	cmp	byte[pilaPosfijo + EBX], '0'
 	je	Cero
 	
 	cmp	byte[pilaPosfijo + EBX], '1'
 	je	Uno
-	;jg	loop1
+	
 	
 	push	EBX
 	push	ECX
-
+	
+	;PutStr	operando
 	b_d	operando
 	
 	pop 	ECX
 	pop	EBX
-	PutLInt	EAX
-	nwln
+	
 	push	EAX 		;METE EL NUMERO EN ENTERO A LA PILA
 	sub	EDX, EDX
 	;jmp	SALIR_posfijo_2
@@ -176,32 +170,41 @@ Cero_F:
 
 ;-------------------------------------------------	
 oct_num:
-	cmp	byte[operation + EBX], 'o'
-	je	o
-	
-	cmp	byte[operation + EBX], '0'
-	jge	Cero_siete
-
-	jmp	loop1
-	
-o:
-	mov	byte[pilaPosfijo+EDX], 'o'
+	mov	EDX, 0
+	mov	byte[operando+EDX], 'o'
 	inc	EBX
 	inc 	EDX
-	jmp	oct_num
+o:
+	
+	cmp	byte[pilaPosfijo + EBX], '0'
+	jge	Cero_siete
+	jmp	Next
 
 	
 Cero_siete:
-	cmp	byte[operation + EBX], '7'
-	jg	ERROR
+	cmp	byte[pilaPosfijo + EBX], '7'
+	jg	Next
 	
 	push	EAX
-	mov	AL, byte[operation + EBX]
-	mov	byte[pilaPosfijo+EDX], AL
+	mov	AL, byte[pilaPosfijo + EBX]
+	mov	byte[operando+EDX], AL
 	pop 	EAX
 	inc	EBX
 	inc 	EDX
-	jmp	oct_num
+	jmp	o
+Next:
+	push	EBX
+	push	ECX
+	
+	o_d	operando
+	
+	pop 	ECX
+	pop	EBX
+	
+	push	EAX 		;METE EL NUMERO EN ENTERO A LA PILA
+	sub	EDX, EDX
+	
+	jmp	borrar_operando
 
 ;-------------------------------------------------
 dec_num:
@@ -276,10 +279,10 @@ SALIR_posfijo:
 SALIR_posfijo_2:	
 	inc	EBX
 	
-	;pop	EAX
-	;PutLInt	EAX
+	pop	EAX
+	PutStr 	resul
+	PutLInt	EAX
 	
-	;PutStr pilaPosfijo
 	nwln
 	.EXIT
 
@@ -294,9 +297,11 @@ op_sumar:
 	mov	EDX, dword[segundo_operando]
 	mov	EAX, dword[primer_operando]
 	add	EAX, EDX
-	PutLInt	EAX
+	;PutLInt	EAX
 	pop	EDX
-	jmp	SALIR_posfijo_2
+	push	EAX
+	inc	EBX
+	jmp	loop1
 	
 
 
@@ -310,9 +315,10 @@ op_restar:
 	mov	EDX, dword[segundo_operando]
 	mov	EAX, dword[primer_operando]
 	sub	EAX, EDX
-	PutLInt	EAX
+	;PutLInt	EAX
 	pop	EDX
-	jmp	SALIR_posfijo_2
+	push	EAX
+	jmp	loop1
 
 
 
@@ -320,12 +326,12 @@ op_restar:
 borrar_operando:
 	mov	EDX, 0
 borrar_operando_2:
-	cmp	EDX, 5
-	;cmp	byte[operando + EDX], 0
-	je	SALIR_posfijo_2
+	cmp	byte[operando + EDX], 0
+	je	loop1
 	mov	byte[operando + EDX], 0
 	inc	EDX
-	jmp	SALIR_posfijo_2
+	
+	jmp	borrar_operando_2
 
 
 

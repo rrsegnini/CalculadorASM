@@ -11,7 +11,25 @@
 	error_msg 	db 	"Error en los datos ingresados ", 0
 	PDP		db	0
 	PFP		db	0
-		
+
+	;pilaPosfijo	db	'b10o10+',0
+	
+	number1		db	'0000000000', 0
+	number2		db	'0000000000', 0
+	uno_dec		db	'0000000000'	;Para decrementar
+	sum		db	'          ', 0
+	ocho1		db	'0000000008'
+	ocho2		db	'0000000008'
+	potencia	db	'0000000000', 0
+	sum2		db	'          ', 0
+	contador	dw	0
+	total		db	'0000000000', 0
+	final		dd	0
+	cont_op		dw	0
+
+	primer_operando	dd	0
+	segundo_operando dd	0
+	resul		db	'Resultado: '	
 
 
 
@@ -21,6 +39,8 @@
 	digit	resb	4
 	pilaPosfijo	resb	264
 	frac	resd	1
+
+	operando resb 	264
 
 .CODE
 	.STARTUP
@@ -32,11 +52,15 @@ nwln
 main:
 	PutStr	prompt
 	GetStr	operation
+
+	cmp	dword[operation], '#salir'
+	je	SALIR_calcu
 	checkFloat	operation
 	cmp	EAX, 'True'
 	je	puntoFlotante
 
 	posfijo
+	evaluar
 	jmp	main
 	
 	
@@ -52,6 +76,9 @@ puntoFlotante:
 	nwln
 	jmp	main
 
+SALIR_calcu:
 
 	.EXIT
-
+;nasm -f elf32 main.asm
+;ld main.o -o main io.o b_h.o
+;./main

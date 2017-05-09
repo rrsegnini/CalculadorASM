@@ -12,7 +12,16 @@
 	PDP		db	0
 	PFP		db	0
 
-	;pilaPosfijo	db	'b10o10+',0
+	ayuda		db	"Los números binarios comienzan con una b y los octales con una o. Ejemplo: o123+b1001 ", 0
+	ayuda_2		db	"Se recomienda ingresar operaciones simples, como las del ejemplo. ", 0
+	ayuda_3		db	"Para punto flotante (solo binario a decimal), ingrese la cantidad que desea convertir. Ej: 1001.1", 0
+
+
+	info		db	"Instituto Tecnológico de Costa Rica. Ingeniería en Computación. Arquitectura de Computadores", 0
+	info_2		db	"Estudiante: Roberto Rojas Segnini, 2016139072",0
+	info_3		db	"I semestre del 2017", 0
+
+
 	
 	number1		db	'0000000000', 0
 	number2		db	'0000000000', 0
@@ -29,7 +38,7 @@
 
 	primer_operando	dd	0
 	segundo_operando dd	0
-	resul		db	'Resultado: '	
+	resul		db	'Resultado: ', 0	
 
 
 
@@ -50,22 +59,36 @@ nwln
 nwln
 
 main:
+
+
 	PutStr	prompt
 	GetStr	operation
 
 	cmp	dword[operation], '#salir'
 	je	SALIR_calcu
+
+	cmp	dword[operation], '#ayuda'
+	je	AYUDA_calcu	
+
 	checkFloat	operation
 	cmp	EAX, 'True'
 	je	puntoFlotante
 
 	posfijo
 	evaluar
-	jmp	main
+	jmp	borrar_pila
 	
 	
 
-
+borrar_pila:
+	mov	EDX, 0
+borrar_pila_2:
+	cmp	byte[pilaPosfijo + EDX], 0
+	je	main
+	mov	byte[pilaPosfijo + EDX], 0
+	inc	EDX
+	
+	jmp	borrar_pila_2
 
 
 puntoFlotante:
@@ -75,9 +98,21 @@ puntoFlotante:
 	PutLInt	dword[frac]
 	nwln
 	jmp	main
-
+AYUDA_calcu:
+	PutStr	ayuda
+	nwln
+	PutStr	ayuda_2
+	nwln
+	PutStr	ayuda_3
+	nwln
+	jmp main
 SALIR_calcu:
-
+	PutStr	info
+	nwln
+	PutStr	info_2
+	nwln
+	PutStr	info_3
+	nwln
 	.EXIT
 ;nasm -f elf32 main.asm
 ;ld main.o -o main io.o b_h.o

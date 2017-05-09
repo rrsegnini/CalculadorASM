@@ -1443,7 +1443,7 @@ borrar_operando_2:
 	jmp	borrar_operando_2
 
 SALIR_posfijo_2_e:	
-	inc	EBX
+	;inc	EBX
 	
 	pop	EAX
 	PutStr 	resul
